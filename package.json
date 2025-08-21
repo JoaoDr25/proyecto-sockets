@@ -1,0 +1,27 @@
+{
+  "name": "08-websocket-server",
+  "version": "1.0.0",
+  "description": "Un servidor de Websockets usando Node, Express y Socket.io",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mpgigat/fh-sockets.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mpgigat/fh-sockets/issues"
+  },
+  "homepage": "https://github.com/mpgigat/fh-sockets#readme",
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {}
+}
