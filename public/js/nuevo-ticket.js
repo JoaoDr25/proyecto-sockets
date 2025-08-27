@@ -1,8 +1,13 @@
-// public/js/nuevo-ticket.js
 const lblNuevoTicket = document.querySelector('#lblNuevoTicket');
 const btnCrear = document.querySelector('button');
+const inputNombre = document.querySelector('#inputNombre');
+const inputId = document.querySelector('#inputId');
 
 const socket = io();
+
+function updateTicketLabel(nextTicket) {
+    lblNuevoTicket.innerText = nextTicket ? `Ticket ${nextTicket}` : 'Ticket ...';
+}
 
 socket.on('connect', () => {
     btnCrear.disabled = false;
@@ -12,15 +17,25 @@ socket.on('disconnect', () => {
     btnCrear.disabled = true;
 });
 
-// Escuchamos el evento de tickets pendientes del servidor
-socket.on('tickets-pendientes', (pendientes) => {
-    // Puedes actualizar un label de tickets pendientes si lo agregas al HTML
-    // Por ahora, solo lo logueamos
-    console.log('Tickets pendientes:', pendientes);
+socket.on('estado-actual', ({ nextTicket }) => {
+    updateTicketLabel(nextTicket);
 });
 
 btnCrear.addEventListener('click', () => {
-    socket.emit('siguiente-ticket', null, (ticket) => {
-        lblNuevoTicket.innerText = ticket;
+    const nombre = inputNombre.value.trim();
+    const idNumber = inputId.value.trim();
+    if (!nombre || !idNumber) {
+        alert('Por favor ingrese nombre y número de identificación.');
+        return;
+    }
+    socket.emit('siguiente-ticket', { nombre, idNumber }, (resp) => {
+        if (!resp.ok) {
+            alert(resp.msg);
+            return;
+        }
+        updateTicketLabel(resp.nextTicket);
+        inputNombre.value = '';
+        inputId.value = '';
+        inputNombre.focus();
     });
 });

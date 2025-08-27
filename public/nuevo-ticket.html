@@ -13,25 +13,40 @@
 
 <body>
 
+    <div class="container text-center mt-5 border-black">
     <table>
         <tr>
             <td>
-                <span id="lblNuevoTicket">
-                    Cargando...
-                </span>
+                <span id="lblNuevoTicket">Ticket __</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h4 class="mb-3">INGRESAR DATOS</h4>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="inputNombre" class="form-label">Nombre Completo</label>
+                    <input id="inputNombre" type="text" class="form-control mb-2 input-narrow" required />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                    <label for="inputId" class="form-label w-auto d-inline-block">Número de identificación</label>
+                    <input id="inputId" type="text" class="form-control mb-2 input-narrow" required />
             </td>
         </tr>
         <tr>
             <td>
                 <button class="btn btn-secondary btn-lg">
-                    Generar nuevo ticket
+                    Generar Nuevo Ticket
                 </button>
             </td>
         </tr>
     </table>
+    </div>
 
-
-    <script src="./js/nuevo-ticket.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="./js/nuevo-ticket.js"></script>
 </body>

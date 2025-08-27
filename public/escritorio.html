@@ -7,24 +7,25 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Programa de Colas</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
 </head>
 
 <body class="container">
-    <h1 class="mt-5">Escritorio</h1>
+    <h1 class="mt-5">Control de Tickets</h1>
     <hr>
-    <div class="row">
+    <div class="row border-black" style="margin-top:2rem;">
         <div class="col-8">
-            <h4>Atendiendo a <small class="text-primary">....</small></h4>
-        
-            <button class="btn btn-primary mt-5">
-                Atender siguiente ticket
-            </button>
+            <h4>Atendiendo a <small id="lblTicket" class="text-primary">....</small></h4>
+
+            <button id="btnAtender" class="btn btn-primary">Atender siguiente ticket</button>
+            <button id="btnReset" class="btn btn-danger">Reiniciar tickets</button>
+
         </div>
 
         <div class="col-4 text-center">
             <h4>En cola</h4>
-            
+
             <div class="alert alert-info mt-2">
                 <span>Ya no hay más tickets</span>
             </div>
@@ -33,6 +34,7 @@
         </div>
     </div>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script src="./js/escritorio.js"></script>
 
 </body>

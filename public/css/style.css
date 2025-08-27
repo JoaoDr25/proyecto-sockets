@@ -28,9 +28,39 @@ table {
     font-size: 25px;
 }
 
+td {
+    height: 80px;
+}
 
-/* Nuevo-ticket */
+.input-narrow {
+    max-width: 350px;
+    min-width: 180px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
 
 #lblNuevoTicket {
     font-size: 70px;
+}
+
+.border-black {
+    border-radius: 12px;
+    padding: 24px 16px;
+    background: transparent;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.btn-lg {
+   background-color: #3d4247;
+   border-color: #000000;
+}
+
+.btn-lg:hover {
+    transform: translate(0, 1px);
+    background-color: #272b2e;
+    color: white;
 }

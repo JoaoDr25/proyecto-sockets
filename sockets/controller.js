@@ -1,46 +1,87 @@
-// sockets/controller.js
-import { TicketControl } from '../models/ticket-control.js'; 
+import { TicketControl } from '../models/ticket-control.js';
+const DESK_SECRET = process.env.DESK_SECRET || 'supersecret123';
 
 const ticketControl = new TicketControl();
 
-const socketController = (socket) => {
-    // Al conectar, emitir el estado actual
+const socketController = (socket, io) => {
     socket.emit('estado-actual', {
         ultimos4: ticketControl.ultimosTickets,
-        pendientes: ticketControl.ticketsPendientes
+        proximos4: ticketControl.ticketsPendientes.slice(0, 4),
+        ultimoAtendido: ticketControl.ultimosTickets[0] || null,
+        pendientes: ticketControl.ticketsPendientes.length,
+        nextTicket: ticketControl.getNextTicketNumber()
     });
 
     socket.on('siguiente-ticket', (payload, callback) => {
-        const siguiente = ticketControl.siguiente();
-        callback(siguiente); // Devuelve el nuevo ticket al cliente que lo pidió
 
-        // Notificar a todos los clientes que hay un nuevo ticket
-        socket.broadcast.emit('tickets-pendientes', ticketControl.ticketsPendientes);
+    const { nombre, idNumber } = payload || {};
+    if (!nombre || !idNumber) {
+        return callback({ ok: false, msg: 'Nombre e identificación requeridos.' });
+    }
+
+    const ticket = ticketControl.siguiente(nombre, idNumber);
+
+    const nextTicket = ticketControl.getNextTicketNumber();
+    callback({ ok: true, ticket, nextTicket });
+
+    io.emit('estado-actual', {
+        ultimos4: ticketControl.ultimosTickets,
+        proximos4: ticketControl.ticketsPendientes.slice(0, 4),
+        ultimoAtendido: ticketControl.ultimosTickets[0] || null,
+        pendientes: ticketControl.ticketsPendientes.length,
+        nextTicket: ticketControl.getNextTicketNumber()
+    });
+    io.emit('tickets-pendientes', ticketControl.ticketsPendientes.length);
     });
 
-    socket.on('atender-ticket', ({ escritorio }, callback) => {
-        if (!escritorio) {
-            return callback({ ok: false, msg: 'El escritorio es obligatorio' });
+    socket.on('atender-ticket', ({ escritorio, token }, callback) => {
+        if (token !== DESK_SECRET) {
+            return callback({ ok: false, msg: 'No autorizado' });
         }
+        const result = ticketControl.atenderTicket(escritorio);
 
-        const ticket = ticketControl.atenderTicket(escritorio);
-
-        // Notificar a todos los clientes el cambio
-        socket.broadcast.emit('estado-actual', {
+        io.emit('estado-actual', {
             ultimos4: ticketControl.ultimosTickets,
-            pendientes: ticketControl.ticketsPendientes
+            proximos4: ticketControl.ticketsPendientes.slice(0, 4),
+            ultimoAtendido: ticketControl.ultimosTickets[0] || null,
+            pendientes: ticketControl.ticketsPendientes.length,
+            nextTicket: ticketControl.getNextTicketNumber()
         });
-        
-        // Notificar a todos el número de tickets pendientes
-        socket.broadcast.emit('tickets-pendientes', ticketControl.ticketsPendientes);
 
-        if (!ticket) {
-            callback({ ok: false, msg: 'Ya no hay más tickets' });
+        io.emit('tickets-pendientes', ticketControl.ticketsPendientes.length);
+
+        if (!result.error) {
+            io.emit('ticket-atendiendo', result.ticket);
+            io.emit('ticket-atendido');
+        }
+
+        if (result.error) {
+            callback({ ok: false, msg: result.msg });
         } else {
-            callback({ ok: true, ticket });
+            callback({ ok: true, ticket: result.ticket });
         }
     });
 
-}
+    socket.on('reset-tickets', (callback, token) => {
+        if (token !== DESK_SECRET) {
+            return callback?.({ ok: false, msg: 'No autorizado' });
+        }
+        ticketControl.reset();
+
+        io.emit('estado-actual', {
+            ultimos4: ticketControl.ultimosTickets,
+            proximos4: ticketControl.ticketsPendientes.slice(0, 4),
+            ultimoAtendido: ticketControl.ultimosTickets[0] || null,
+            pendientes: ticketControl.ticketsPendientes.length,
+            nextTicket: ticketControl.getNextTicketNumber()
+        });
+
+        io.emit('tickets-pendientes', 0);
+
+        callback?.({ ok: true, msg: 'Tickets reiniciados exitosamente' });
+    });
+};
 
 export { socketController };
+
+
